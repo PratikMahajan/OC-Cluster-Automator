@@ -19,19 +19,17 @@ import (
 type Flags struct {
 	// Creating Cluster
 	Create bool
-
 	// Destroy Cluster
 	Destroy bool
-
 	// Dry run of Algo
 	DryRun bool
+	// Platform to create cluster on
+	Platform string
 }
 
 type Cluster struct {
-	Name string
-
-	Dir string
-
+	Name     string
+	Dir      string
 	Platform string
 }
 
@@ -69,12 +67,25 @@ func main() {
 	flag.BoolVar(&flags.Create, "create", false, "Create a new cluster")
 	flag.BoolVar(&flags.Destroy, "destroy", false, "Destroy the cluster")
 	flag.BoolVar(&flags.DryRun, "dryrun", false, "Dry run the program")
+	flag.StringVar(&flags.Platform, "platform", "", "Platform to create cluster (aws/azure)")
 	flag.Parse()
 
 	// Find auxiliary scripts
 	cwd, err := os.Getwd()
 	if err != nil {
 		logger.Fatal("failed to get working directory: ", zap.String("err", err.Error()))
+	}
+
+	platform := ""
+	switch flags.Platform {
+	case "aws":
+		platform = "aws"
+	case "azure":
+		platform = "azure"
+	case "":
+		logger.Fatal("Please enter a platform to create the cluster on")
+	default:
+		log.Fatalf("Platform '%s' is not supported. Try aws/azure", flags.Platform)
 	}
 
 	// run-openshift-install.sh script
@@ -90,7 +101,7 @@ func main() {
 	cluster := Cluster{
 		Name:     fmt.Sprintf("%s-%s", cfg.ClusterNamePrefix, currentDate),
 		Dir:      cfg.OCStorePath,
-		Platform: cfg.Platform,
+		Platform: platform,
 	}
 
 	if flags.Create {

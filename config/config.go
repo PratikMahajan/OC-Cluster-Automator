@@ -6,7 +6,6 @@ import (
 )
 
 // Config holds application configuration
-
 type Config struct {
 
 	// Prefix of cluster name
@@ -20,8 +19,6 @@ type Config struct {
 
 	// SSH key for the cluster
 	SSHKey string `json:"sshkey" required:"true"`
-
-	Platform string `json:"platform" required:"true"`
 }
 
 // NewConfig loads configuration values from environment variables
