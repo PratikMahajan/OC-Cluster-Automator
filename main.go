@@ -15,8 +15,8 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/PratikMahajan/OC-Cluster-Manager/config"
-	"github.com/PratikMahajan/OC-Cluster-Manager/models"
+	"github.com/PratikMahajan/OC-Cluster-Automator/config"
+	"github.com/PratikMahajan/OC-Cluster-Automator/models"
 	"go.uber.org/zap"
 )
 

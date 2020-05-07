@@ -1,4 +1,4 @@
-module github.com/PratikMahajan/OC-Cluster-Manager
+module github.com/PratikMahajan/OC-Cluster-Automator
 
 go 1.13
 
