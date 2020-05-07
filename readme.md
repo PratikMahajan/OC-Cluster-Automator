@@ -14,8 +14,9 @@ Create and Destroy Openshift clusters with hybrid overlay on AWS and Azure
 
 ## Run Flags
 * `-create` : Create cluster 
-* `-destroy`: Delete cluster
-* `-platfrom`: Platform to create cluster on (AWS/Azure) <br>
+* `-destroy=`: Name of the cluster to delete <br>
+                eg. `-destroy="<cluster_name>"`
+* `-platfrom=`: Platform to create cluster on (AWS/Azure) <br>
                 eg. `-platform="azure"`
 * `-dryrun` : View the command to be executed
 
@@ -23,6 +24,8 @@ Create and Destroy Openshift clusters with hybrid overlay on AWS and Azure
 ### Create Cluster 
 `go run main.go -create -platform=<aws/azure>`
 
+Creates a cluster on the platform and saves information in `APP_OCSTOREPATH`
+
 ### Destroy Cluster
-`go run main.go -destroy -platform=<aws/azure>`
+`go run main.go -destroy="<cluster_name>" -platform=<aws/azure>`
 
