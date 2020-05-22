@@ -29,6 +29,8 @@ type Flags struct {
 	DryRun bool
 	// Platform to create cluster on
 	Platform string
+	// Refresh opensift-install script
+	Refresh string
 }
 
 func main() {
@@ -66,6 +68,7 @@ func main() {
 	flag.StringVar(&flags.Destroy, "destroy", "nil", "Destroy the cluster")
 	flag.BoolVar(&flags.DryRun, "dryrun", false, "Dry run the program")
 	flag.StringVar(&flags.Platform, "platform", "", "Platform to create cluster (aws/azure)")
+	flag.StringVar(&flags.Refresh, "r", "", "Refresh the openshift-install binary to version. Uses previous download by default")
 	flag.Parse()
 
 	// Find auxiliary scripts
@@ -84,6 +87,30 @@ func main() {
 		logger.Fatal("Please enter a platform to create the cluster on")
 	default:
 		log.Fatalf("Platform '%s' is not supported. Try aws/azure", flags.Platform)
+	}
+
+	// download the oc binary if refresh tag is set
+	if flags.Refresh != "" {
+		downloadOpenShiftInstall := filepath.Join(cwd,
+			"scripts/openshift-install-download.sh")
+		if _, err := os.Stat(downloadOpenShiftInstall); err != nil {
+			logger.Fatal("failed to stat scripts/openshift-install-download.sh: ",
+				zap.String("err", err.Error()))
+		}
+
+		ocBinLocation := "/home/mahajan"
+		// download openshift install script
+		cmd := exec.Command(downloadOpenShiftInstall,
+			"-v", flags.Refresh,
+			"-d", ocBinLocation)
+		err := runCmd(logger, cmd)
+		if err != nil {
+			logger.Fatal("failed to download openshift-install binary at ",
+				zap.String(ocBinLocation, err.Error()))
+		}
+
+		logger.Info("openshift-install binary refreshed", zap.String("Version", flags.Refresh))
+
 	}
 
 	// run-openshift-install.sh script
