@@ -19,6 +19,8 @@ Create and Destroy Openshift clusters with hybrid overlay on AWS and Azure
 * `-platfrom=`: Platform to create cluster on (AWS/Azure) <br>
                 eg. `-platform="azure"`
 * `-dryrun` : View the command to be executed
+* `-r=`     : Refresh the oc binary to required version<br>
+                eg. `-r=4.5`
 
 ## Run
 ### Create Cluster 
