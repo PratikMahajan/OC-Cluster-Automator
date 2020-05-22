@@ -278,6 +278,9 @@ func removeClusterInfo(cluster models.Cluster, storePath string) error {
 			return fmt.Errorf("unable to get cluster data from file %s:%v", jsonFile, err)
 		}
 		clusterIndex := indexOf(cluster, data.Clusters[cluster.Platform])
+		if clusterIndex == -1 {
+			return nil
+		}
 		data.Clusters[cluster.Platform] = removeIndex(data.Clusters[cluster.Platform], clusterIndex)
 	}
 	js, err = json.Marshal(data)
@@ -323,7 +326,7 @@ func getSavedClusterInfo(storePath string) (*models.ClusterStore, error) {
 }
 
 //randomString generates random string of given length.
-// ex: for n = 5 it generates 6p7l0
+// ex: for n = 5 it will generate something like "6p7l0"
 func randomString(n int) string {
 	tm := fmt.Sprintf("%d", time.Now().UnixNano())
 	var letter = []rune("abcdefghijklmnopqrstuvwxyz0123456789")
@@ -337,5 +340,7 @@ func randomString(n int) string {
 			b[i] = timeS[rand.Intn(len(timeS))]
 		}
 	}
+	rand.Seed(time.Now().UnixNano())
+	rand.Shuffle(len(b), func(i, j int) { b[i], b[j] = b[j], b[i] })
 	return string(b)
 }
