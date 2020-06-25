@@ -12,12 +12,14 @@ import (
 	"os"
 	"os/exec"
 	"os/signal"
+	"os/user"
 	"path/filepath"
 	"time"
 
 	"github.com/PratikMahajan/OC-Cluster-Automator/config"
 	"github.com/PratikMahajan/OC-Cluster-Automator/models"
 	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
 )
 
 type Flags struct {
@@ -35,10 +37,18 @@ type Flags struct {
 
 func main() {
 
-	logger, err := zap.NewProduction()
-	if err != nil {
-		log.Fatalf("can't initialize zap logger: %v", err)
-	}
+	atom := zap.NewAtomicLevel()
+
+	encoderCfg := zap.NewProductionEncoderConfig()
+	encoderCfg.TimeKey = "t"
+	encoderCfg.EncodeTime = zapcore.ISO8601TimeEncoder
+
+	logger := zap.New(zapcore.NewCore(
+		zapcore.NewJSONEncoder(encoderCfg),
+		zapcore.Lock(os.Stdout),
+		atom,
+	))
+
 	defer logger.Sync()
 
 	// graceful exit
@@ -98,12 +108,19 @@ func main() {
 				zap.String("err", err.Error()))
 		}
 
-		ocBinLocation := "/home/mahajan"
+		user, err := user.Current()
+		if err != nil {
+			log.Fatalf("unable to retrieve user: %v", err)
+		}
+
+		// TEMPORARY: currently defaults to user home directory, will be changed in future.
+		ocBinLocation := user.HomeDir
+
 		// download openshift install script
 		cmd := exec.Command(downloadOpenShiftInstall,
 			"-v", flags.Refresh,
 			"-d", ocBinLocation)
-		err := runCmd(logger, cmd)
+		err = runCmd(logger, cmd)
 		if err != nil {
 			logger.Fatal("failed to download openshift-install binary at ",
 				zap.String(ocBinLocation, err.Error()))
