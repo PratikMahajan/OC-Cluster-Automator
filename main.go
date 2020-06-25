@@ -12,6 +12,7 @@ import (
 	"os"
 	"os/exec"
 	"os/signal"
+	"os/user"
 	"path/filepath"
 	"time"
 
@@ -107,12 +108,19 @@ func main() {
 				zap.String("err", err.Error()))
 		}
 
-		ocBinLocation := "/home/mahajan"
+		user, err := user.Current()
+		if err != nil {
+			log.Fatalf("unable to retrieve user: %v", err)
+		}
+
+		// TEMPORARY: currently defaults to user home directory, will be changed in future.
+		ocBinLocation := user.HomeDir
+
 		// download openshift install script
 		cmd := exec.Command(downloadOpenShiftInstall,
 			"-v", flags.Refresh,
 			"-d", ocBinLocation)
-		err := runCmd(logger, cmd)
+		err = runCmd(logger, cmd)
 		if err != nil {
 			logger.Fatal("failed to download openshift-install binary at ",
 				zap.String(ocBinLocation, err.Error()))
